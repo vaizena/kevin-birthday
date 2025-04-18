@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎉 Kevin's Trivia Birthday Quiz 🎉</title>
+    <style>
+        body {
+            font-family: Georgia, Times;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: url('kevburf.JPG') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: -1;
+        }
+
+        h2 {
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #question-box {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .option-btn {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: crosshair;
+            border: none;
+            border-radius: 6px;
+            background: #e7e7e7;
+        }
+
+        .option-btn:hover {
+            background: #ffce44;
+        }
+
+        #result {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        #start-screen button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+            background: #ffd966;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #start-screen button:hover {
+            background: #ffce44;
+        }
+    </style>
+
+    <!-- Confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+    <div id="overlay"></div>
+
+    <!-- Splash screen -->
+    <div id="start-screen">
+        <h1>🎂 Welcome to Kevin's Birthday Trivia 🎂</h1>
+        <p>Test your skills!</p>
+        <button onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <h2>🎉 Kevin's Trivia Birthday Quiz 🎉</h2>
+    <div id="question-box">
+        <p id="question-text"></p>
+        <div id="options"></div>
+        <p id="result"></p>
+    </div>
+
+    <!-- 🎵 Audio -->
+    <audio id="bg-music" src="background.mp3" loop></audio>
+    <audio id="win-sound" src="victory.mp3"></audio>
+
+    <script>
+        const questions = [
+            {
+                question: "Am I a good sister?",
+                options: ["Yes, the best!", "Nah, you suck.", "Debatable."],
+                correct: "Yes, the best!",
+                roast: "Really? Try again bro."
+            },
+            {
+                question: "Which Pokémon evolves into Charizard?",
+                options: ["Pikachu", "Charmander", "Bulbasaur"],
+                correct: "Charmander",
+                roast: "Fraud alert."
+            },
+            {
+                question: "Who has scored the most points in NBA history?",
+                options: ["Michael Jordan", "LeBron James", "Kareem Abdul-Jabbar"],
+                correct: "LeBron James",
+                roast: "We got a casual fan here..."
+            },
+            {
+                question: "Which AESPA member has a black belt in Taekwondo?",
+                options: ["Ningning", "Winter", "Karina"],
+                correct: "Karina",
+                roast: "I'm judging you right now."
+            },
+            {
+                question: "Which of the following is not one of the Nine Titan powers?",
+                options: ["Attact Titan", "Founder Titan", "Crystal Titan"],
+                correct: "Crystal Titan",
+                roast: "Get good."
+            },
+            {
+                question: "What type of muscle tissue is responsible for movement of the bones in the body?",
+                options: ["Skeletal muscle tissue", "Smooth muscle", "Cardiac muscle"],
+                correct: "Skeletal muscle tissue",
+                roast: "Go back to school tsk tsk."
+            },
+            {
+                question: "Although Georgia has been known for many years as the Bulldogs, their first mascot was which animal?",
+                options: ["Tiger", "Goat", "Ram"],
+                correct: "Goat",
+                roast: "THWg"
+            }
+        ];
+
+        let current = 0;
+
+        function startQuiz() {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("question-box").style.display = "block";
+            document.getElementById("bg-music").play().catch((e) => {
+                console.warn("Autoplay failed:", e);
+            });
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[current];
+            document.getElementById("question-text").textContent = q.question;
+            const optionsDiv = document.getElementById("options");
+            const result = document.getElementById("result");
+            result.textContent = "";
+            optionsDiv.innerHTML = "";
+
+            q.options.forEach(option => {
+                const btn = document.createElement("button");
+                btn.textContent = option;
+                btn.className = "option-btn";
+                btn.onclick = () => checkAnswer(option);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(choice) {
+            const q = questions[current];
+            const result = document.getElementById("result");
+
+            if (choice === q.correct) {
+                result.textContent = "✅ Correct!";
+                current++;
+                setTimeout(() => {
+                    if (current < questions.length) {
+                        loadQuestion();
+                    } else {
+                        showFinalReward();
+                    }
+                }, 1000);
+            } else {
+                result.textContent = "❌ " + q.roast;
+            }
+        }
+
+        function showFinalReward() {
+    document.getElementById("question-box").innerHTML = `
+        <div id="reward-content">
+            <h3>🎉 Make a wish and blow out your candles...</h3>
+            <p>💨 *PFFFFHHHHHHHHHHH*</p>
+            <h2>🚗 Happy 23rd Birthday! You win a <b>DEEP clean car wash</b> from your favorite sibling!!</h2>
+        </div>
+
+        <button id="share-btn">📤 Share this moment</button>
+        <button id="screenshot-btn">📸 Save Screenshot</button>
+        <p id="copy-status" style="color: green; font-weight: bold;"></p>
+    `;
+
+    document.getElementById("bg-music").pause();
+    document.getElementById("win-sound").play();
+
+    confetti({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.6 }
+    });
+
+    const duration = 2 * 1000;
+    const animationEnd = Date.now() + duration;
+
+    const confettiInterval = setInterval(function () {
+        if (Date.now() > animationEnd) {
+            clearInterval(confettiInterval);
+        }
+        confetti({
+            particleCount: 50,
+            spread: 70,
+            origin: {
+                x: Math.random(),
+                y: Math.random() * 0.4
+            }
+        });
+    }, 250);
+
+    setTimeout(() => {
+        const shareBtn = document.getElementById("share-btn");
+        const screenshotBtn = document.getElementById("screenshot-btn");
+        const copyStatus = document.getElementById("copy-status");
+
+        // SHARE
+        shareBtn.onclick = () => {
+            const message = `🎉 Kevin just completed the Ultimate B-Day Quiz & won a FREE car wash 🧼🚗 (from the best sibling, obviously)`;
+            navigator.clipboard.writeText(message).then(() => {
+                copyStatus.textContent = "Copied to clipboard!";
+            }).catch(() => {
+                copyStatus.textContent = "Copy failed. Try again!";
+            });
+        };
+
+        // SCREENSHOT
+        screenshotBtn.onclick = () => {
+            html2canvas(document.getElementById("reward-content")).then(canvas => {
+                const link = document.createElement("a");
+                link.download = "kevin_birthday_win.png";
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        };
+    }, 1000);
+}
+</script>
+
+</body>
+</html>
