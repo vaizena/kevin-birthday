@@ -258,16 +258,6 @@
                 copyStatus.textContent = "Copy failed. Try again!";
             });
         };
-
-        // SCREENSHOT
-        screenshotBtn.onclick = () => {
-            html2canvas(document.getElementById("reward-content")).then(canvas => {
-                const link = document.createElement("a");
-                link.download = "kevin_birthday_win.png";
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-        };
     }, 1000);
 }
 </script>
